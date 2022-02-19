@@ -8,7 +8,7 @@ CWD = os.path.dirname(os.path.realpath(__file__))
 HOSTKEY = paramiko.RSAKey(filename=os.path.join(CWD, 'paramiko_demos/test_rsa.key'))
 
 
-class Server (paramiko.ServerInterface()):
+class Server (paramiko.ServerInterface):
     def _init_(self):
         self.event = threading.Event()
 
@@ -60,7 +60,7 @@ if __name__ == '__main__':
                 res = channel.recv(8192)
                 print(res.decode())
             else:
-                chan.send('exit')
+                channel.send('exit')
                 print('Exiting...')
                 session.close()
                 break
